@@ -84,7 +84,8 @@
                   <img src="../../assets/icons/add_24.svg" alt="Add product">
                   <span class="px-2">Add Product</span>
                 </button>
-                <button (click)="saveProducts()" class="main-btn inline-flex items-center save-all">
+                <button (click)="saveProducts()" [disabled]="!dataModified"
+                  class="main-btn inline-flex items-center save-all">
                   <img src="../../assets/icons/done_all_24.svg" alt="Save all">
                   <span class="px-2">Save all</span>
                 </button>

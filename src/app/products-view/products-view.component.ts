@@ -1,30 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-
-export interface Product {
-  id: number,
-  code: number;
-  name: string;
-  basePrice: number;
-  totalPrice: number;
-}
-
-export interface ProductTax {
-  productId: number;
-  tax: number;
-}
-
-export type ProductWithTax = Product & Pick<ProductTax, 'tax'>;
-
-const TAX_RATES = [0, 20, 21, 33, 50];
-const DEFAULT_TAX_RATE = 21;
-
-const PRODUCT_TEMPLATE = {
-  id: 0,
-  code: 0,
-  name: 'Product name',
-  basePrice: 0,
-  totalPrice: 0
-};
+import { TAX_RATES, DEFAULT_TAX_RATE, PRODUCT_TEMPLATE } from '../constants/productConstants'
+import { ProductService } from '../services/product.service';
+import { Product, ProductTax, ProductWithTax } from './productTypes';
 
 @Component({
   selector: 'app-products-view',
@@ -35,22 +12,20 @@ export class ProductsViewComponent implements OnInit {
   productToEdit: ProductWithTax | null = null;
   products: Product[] = [];
   taxRates = TAX_RATES;
+  dataModified = false;
   private productsTaxes: ProductTax[] = [];
 
-  constructor() { }
+  constructor(private productService: ProductService) { }
 
   ngOnInit(): void {
-    // TODO: data fetch from a storage
-    this.products = new Array(2).fill(1).map((x, i) => ({ ...PRODUCT_TEMPLATE, code: i + 100, basePrice: 1, id: i + 1 }));
-    // store taxes for each product in a different data structure to maintain original Product DTO (without tax property)
-    this.productsTaxes = this.products.map(p => ({ productId: p.id, tax: 21 }));
-    // this.tempProducts = JSON.parse(JSON.stringify(this.products));
+    this.products = this.productService.getProducts();
+    this.productsTaxes = this.productService.getProductsTaxes();
   }
 
   addProduct = () => {
     const newProduct = {
       ...PRODUCT_TEMPLATE,
-      id: this.products[this.products.length - 1].id + 1,
+      id: (this.products[this.products.length - 1]?.id || 0) + 1,
     };
     this.products.push(newProduct);
     this.productToEdit = { ...newProduct, tax: DEFAULT_TAX_RATE };
@@ -93,6 +68,7 @@ export class ProductsViewComponent implements OnInit {
       this.productsTaxes.splice(taxesIdx, 1, { productId: p.id, tax });
     }
     this.productToEdit = null;
+    this.dataModified = true;
   };
 
   cancelEditting = () => this.productToEdit = null;
@@ -122,6 +98,8 @@ export class ProductsViewComponent implements OnInit {
   }
 
   saveProducts = () => {
-    // TODO: save to some storage
+    this.productService.saveProducts(this.products);
+    this.productService.saveProductsTaxes(this.productsTaxes);
+    this.dataModified = false;
   }
 }
