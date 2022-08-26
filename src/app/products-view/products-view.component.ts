@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { TAX_RATES, DEFAULT_TAX_RATE, PRODUCT_TEMPLATE } from '../constants/productConstants'
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { TAX_RATES, DEFAULT_TAX_RATE, PRODUCT_TEMPLATE } from '../constants/productConstants';
+import { Subscription } from 'rxjs';
 import { ProductService } from '../services/product.service';
 import { Product, ProductTax, ProductWithTax } from './productTypes';
 
@@ -8,18 +9,28 @@ import { Product, ProductTax, ProductWithTax } from './productTypes';
   templateUrl: './products-view.component.html',
   styleUrls: ['./products-view.component.scss']
 })
-export class ProductsViewComponent implements OnInit {
+export class ProductsViewComponent implements OnInit, OnDestroy {
   productToEdit: ProductWithTax | null = null;
   products: Product[] = [];
   taxRates = TAX_RATES;
   dataModified = false;
   private productsTaxes: ProductTax[] = [];
+  private productsSubscription: Subscription;
+  private taxSubscription: Subscription;
 
-  constructor(private productService: ProductService) { }
+  constructor(private productService: ProductService) {
+    this.productsSubscription = Subscription.EMPTY;
+    this.taxSubscription = Subscription.EMPTY;
+  }
 
   ngOnInit(): void {
-    this.products = this.productService.getProducts();
-    this.productsTaxes = this.productService.getProductsTaxes();
+    this.productsSubscription = this.productService.getProducts().subscribe(list => this.products = list);
+    this.taxSubscription = this.productService.getProductsTaxes().subscribe(list => this.productsTaxes = list);
+  }
+
+  ngOnDestroy() {
+    this.productsSubscription?.unsubscribe();
+    this.taxSubscription?.unsubscribe();
   }
 
   addProduct = () => {
@@ -30,18 +41,18 @@ export class ProductsViewComponent implements OnInit {
     this.products.push(newProduct);
     this.productToEdit = { ...newProduct, tax: DEFAULT_TAX_RATE };
     this.productsTaxes.push({ productId: newProduct.id, tax: DEFAULT_TAX_RATE });
-  }
+  };
 
   onFieldChange = (e: any, field: string) => {
     this.productToEdit = { ...this.productToEdit as ProductWithTax, [field]: e.target.value };
-  }
+  };
 
   deleteProduct = (i: Product['id']) => {
     const currentProductIdx = this.products.findIndex(prod => prod.id === i);
     if (currentProductIdx >= 0) {
       this.products.splice(currentProductIdx, 1);
     }
-  }
+  };
 
   editProduct = (p: Product) => {
     const tax = this.productsTaxes.find(t => t.productId === p.id)?.tax;
@@ -76,14 +87,14 @@ export class ProductsViewComponent implements OnInit {
   selectTax = (e: Event, id: number) => {
     const value = (e.target as HTMLInputElement).value;
     if (this.productToEdit?.id === id) this.productToEdit.tax = Number(value);
-  }
+  };
 
-  getTaxForProductId = (id: number, tax: any) => {
+  getTaxForProductId = (id: number) => {
     return id === this.productToEdit?.id ? this.productToEdit.tax : this.productsTaxes.find(t => t.productId === id)?.tax;
   };
 
   isItEditProduct = (id: number) => {
-    return id === this.productToEdit?.id
+    return id === this.productToEdit?.id;
   };
 
   calculateTotal = () => {
@@ -91,15 +102,15 @@ export class ProductsViewComponent implements OnInit {
     this.products.forEach(p => {
       const basePrice = p.basePrice;
       const tax = this.productsTaxes.find(t => t.productId === p.id)?.tax;
-      const price = basePrice * (1 + (tax as number) / 100);
+      const price = basePrice * (1 + (tax || 0) / 100);
       total += price;
     });
     return total;
-  }
+  };
 
   saveProducts = () => {
     this.productService.saveProducts(this.products);
     this.productService.saveProductsTaxes(this.productsTaxes);
     this.dataModified = false;
-  }
+  };
 }
