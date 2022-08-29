@@ -7,30 +7,35 @@ import { Product, ProductTax, ProductWithTax } from './productTypes';
 @Component({
   selector: 'app-products-view',
   templateUrl: './products-view.component.html',
-  styleUrls: ['./products-view.component.scss']
+  styleUrls: ['../app.component.scss', './products-view.component.scss']
 })
 export class ProductsViewComponent implements OnInit, OnDestroy {
   productToEdit: ProductWithTax | null = null;
   products: Product[] = [];
   taxRates = TAX_RATES;
   dataModified = false;
-  private productsTaxes: ProductTax[] = [];
+  productsTaxes: ProductTax[] = [];
+  total = 0;
   private productsSubscription: Subscription;
   private taxSubscription: Subscription;
+  private totalSubscription: Subscription;
 
   constructor(private productService: ProductService) {
     this.productsSubscription = Subscription.EMPTY;
     this.taxSubscription = Subscription.EMPTY;
+    this.totalSubscription = Subscription.EMPTY;
   }
 
   ngOnInit(): void {
     this.productsSubscription = this.productService.getProducts().subscribe(list => this.products = list);
     this.taxSubscription = this.productService.getProductsTaxes().subscribe(list => this.productsTaxes = list);
+    this.totalSubscription = this.productService.getTotal().subscribe(total => this.total = total);
   }
 
   ngOnDestroy() {
     this.productsSubscription?.unsubscribe();
     this.taxSubscription?.unsubscribe();
+    this.totalSubscription?.unsubscribe();
   }
 
   addProduct = () => {
@@ -52,6 +57,12 @@ export class ProductsViewComponent implements OnInit, OnDestroy {
     if (currentProductIdx >= 0) {
       this.products.splice(currentProductIdx, 1);
     }
+    const currentProductTax = this.productsTaxes.findIndex(t => t.productId === i);
+    if (currentProductTax >= 0) {
+      this.productsTaxes.splice(currentProductTax, 1);
+    }
+    this.total = this.calculateTotal();
+    this.dataModified = true;
   };
 
   editProduct = (p: Product) => {
@@ -78,6 +89,7 @@ export class ProductsViewComponent implements OnInit, OnDestroy {
     if (taxesIdx >= 0) {
       this.productsTaxes.splice(taxesIdx, 1, { productId: p.id, tax });
     }
+    this.total = this.calculateTotal();
     this.productToEdit = null;
     this.dataModified = true;
   };
@@ -111,6 +123,7 @@ export class ProductsViewComponent implements OnInit, OnDestroy {
   saveProducts = () => {
     this.productService.saveProducts(this.products);
     this.productService.saveProductsTaxes(this.productsTaxes);
+    this.productService.saveTotal(this.total);
     this.dataModified = false;
   };
 }

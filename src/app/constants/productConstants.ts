@@ -12,3 +12,5 @@ export const PRODUCT_TEMPLATE = {
 export const PRODUCTS_KEY = 'products';
 
 export const PRODUCTS_TAX_RATES_KEY = 'productsTaxRates';
+
+export const TOTAL_KEY = 'total';

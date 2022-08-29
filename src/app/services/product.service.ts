@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { PRODUCTS_KEY, PRODUCTS_TAX_RATES_KEY } from '../constants/productConstants';
+import { Observable, of } from 'rxjs';
+import { PRODUCTS_KEY, PRODUCTS_TAX_RATES_KEY, TOTAL_KEY } from '../constants/productConstants';
 import { Product, ProductTax } from '../products-view/productTypes';
 
 @Injectable({
@@ -20,7 +20,7 @@ export class ProductService {
     if (productsFromStorage) {
       products = JSON.parse(productsFromStorage);
     };
-    return of(products).pipe(delay(1000));
+    return of(products);
   };
 
   saveProducts(products: Product[]) {
@@ -33,10 +33,23 @@ export class ProductService {
     if (taxesFromStorage) {
       taxes = JSON.parse(taxesFromStorage);
     };
-    return of(taxes).pipe(delay(1500));
+    return of(taxes);
   };
 
   saveProductsTaxes(taxes: ProductTax[]) {
     this.saveItemToStorage(PRODUCTS_TAX_RATES_KEY, taxes);
+  };
+
+  getTotal(): Observable<number> {
+    const totalFromStorage = localStorage.getItem(TOTAL_KEY);
+    let total: number = 0;
+    if (totalFromStorage) {
+      total = Number(totalFromStorage);
+    };
+    return of(total);
+  };
+
+  saveTotal(total: number) {
+    this.saveItemToStorage(TOTAL_KEY, total);
   };
 }

@@ -1,0 +1,93 @@
+table {
+    @apply text-gray-900;
+
+    thead {
+        th {
+            @apply px-3 py-3 border-b-2 bg-slate-500 text-left text-xs font-semibold text-white uppercase tracking-wider;
+        }
+    }
+
+    tbody {
+        tr {
+            &:nth-child(even) {
+                @apply bg-gray-50;
+            }
+
+            td {
+                @apply px-3 py-2 border-b border-gray-200 text-sm;
+
+                input,
+                select {
+                    @apply bg-white border border-gray-300 text-gray-900 text-sm rounded-md block w-full p-2;
+
+                    &:focus:active {
+                        @apply border-blue-500 ring-blue-500;
+                    }
+
+                    &:disabled {
+                        @apply border-transparent bg-transparent;
+                    }
+                }
+
+                &.table-action-row {
+                    @apply py-4 text-right;
+                }
+
+                select:after {
+                    padding-right: 20px;
+                }
+            }
+
+            &:hover {
+
+                button.edit-btn,
+                button.delete-btn {
+                    @apply border-gray-200 opacity-100;
+                }
+
+                button.delete-btn {
+                    border-color: #FCC7CA;
+                }
+            }
+        }
+    }
+}
+
+button {
+    @apply bg-transparent py-2 px-2 mx-2 rounded border border-transparent opacity-70;
+
+    &.cancel-btn {
+        @apply opacity-100;
+        border: none;
+        background: #FF3366;
+    }
+
+    &.confirm-btn,
+    &.main-btn {
+        @apply opacity-100;
+        border: none;
+        color: #FFF;
+        background: #4DA4EA;
+    }
+
+    &.secondary-btn {
+        @apply opacity-100;
+        border-color: #4DA4EA;
+        color: #4DA4EA;
+        background: transparent;
+    }
+
+    &:last-child {
+        margin: 0;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+    }
+}
+
+.footer {
+    button.page-btn {
+        @apply px-6 py-3;
+    }
+}

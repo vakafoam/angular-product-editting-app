@@ -1,11 +1,12 @@
-<div class="container mx-auto px-4 sm:px-8">
+<div class="container mx-auto px-4 sm:px-8 max-w-6xl">
+  <h1 class="text-center text-2xl font-bold m-8">Welcome to Products editting</h1>
   <div class="py-8">
     <div>
       <h2 class="text-xl font-semibold leading-tight ">Products</h2>
     </div>
     <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
       <div class="inline-block min-w-full shadow-md rounded-lg overflow-hidden">
-        <table class="min-w-full leading-normal">
+        <table id="products-table" class="min-w-full leading-normal">
 
           <thead>
             <tr>
@@ -19,32 +20,32 @@
           </thead>
 
           <tbody>
-            <tr *ngFor="let product of products; let i = index">
+            <tr id="{{'row-' + i}}" class="product-row" *ngFor="let product of products; let i = index">
               <td class="px-2 py-2">{{i+1}}</td>
 
               <td max-width="30px">
                 <div class="flex">
                   <label>
-                    <input type="text" id="{{ 'code-input-' + product.id }}" [disabled]="!isItEditProduct(product.id)"
+                    <input type="text" id="{{ 'code-input-' + i }}" [disabled]="!isItEditProduct(product.id)"
                       value="{{isItEditProduct(product.id) ? productToEdit?.code : product.code}}"
                       (change)="onFieldChange($event, 'code')" />
                   </label>
                 </div>
               </td>
               <td>
-                <input type="text" [disabled]="!isItEditProduct(product.id)"
+                <input type="text" id="{{ 'name-input-' + i }}" [disabled]="!isItEditProduct(product.id)"
                   value="{{isItEditProduct(product.id) ? productToEdit?.name : product.name}}"
                   (change)="onFieldChange($event, 'name')" />
               </td>
               <td>
-                <input type="text" [disabled]="!isItEditProduct(product.id)"
+                <input type="text" id="{{ 'basePrice-input-' + i }}" [disabled]="!isItEditProduct(product.id)"
                   value="{{isItEditProduct(product.id) ? productToEdit?.basePrice : product.basePrice}}"
                   (change)="onFieldChange($event, 'basePrice')" />
               </td>
               <td>
-                <label for="{{'tax-rate-' + product.id}}">
+                <label for="{{'tax-rate-' + i }}">
                   <select [disabled]="!isItEditProduct(product.id)" (change)='selectTax($event, product.id)'
-                    id="{{'tax-rate-' + product.id}}"
+                    id="{{'tax-rate-' + i }}"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full">
                     <option *ngFor="let tax of taxRates" [selected]="tax === getTaxForProductId(product.id)">
                       {{tax}}
@@ -54,18 +55,18 @@
               </td>
               <td>
                 <div *ngIf="isItEditProduct(product.id)" class="flex justify-end">
-                  <button (click)="confirmEditting(product)" class="confirm-btn">
+                  <button id="{{ 'confirm-' + i }}" (click)="confirmEditting(product)" class="confirm-btn">
                     <img src="../../assets/icons/check_24.svg" width="16" height="16" alt="Confirm edit">
                   </button>
-                  <button (click)="cancelEditting()" class="cancel-btn">
+                  <button id="{{ 'cancel-' + i }}" (click)="cancelEditting()" class="cancel-btn">
                     <img src="../../assets/icons/close_24.svg" width="16" height="16" alt="Cancel edit">
                   </button>
                 </div>
                 <div *ngIf="!isItEditProduct(product.id)" class="flex justify-end">
-                  <button (click)="editProduct(product)" class="edit-btn">
+                  <button id="{{ 'edit-' + i }}" (click)="editProduct(product)" class="edit-btn">
                     <img src="../../assets/icons/edit_24.svg" width="16" height="16" alt="Edit product">
                   </button>
-                  <button (click)="deleteProduct(product.id)" class="delete-btn">
+                  <button id="{{ 'delete-' + i }}" (click)="deleteProduct(product.id)" class="delete-btn">
                     <img src="../../assets/icons/delete_24.svg" width="16" height="16" alt="Delete product">
                   </button>
                 </div>
@@ -74,17 +75,17 @@
 
             <tr class="font-bold text-slate-700">
               <td colSpan="3" class="text-right ">{{'Total with tax:' | uppercase}}</td>
-              <td colSpan="3" class="text-left ">{{calculateTotal() + ' €'}}</td>
+              <td colSpan="3" class="text-left ">{{total + ' €'}}</td>
             </tr>
 
             <tr>
               <td colspan="6" class="table-action-row">
-                <button (click)="addProduct()" [disabled]="!!productToEdit"
+                <button id="add-product" (click)="addProduct()" [disabled]="!!productToEdit"
                   class="secondary-btn inline-flex items-center">
                   <img src="../../assets/icons/add_24.svg" alt="Add product">
                   <span class="px-2">Add Product</span>
                 </button>
-                <button (click)="saveProducts()" [disabled]="!dataModified"
+                <button id="save-products" (click)="saveProducts()" [disabled]="!dataModified"
                   class="main-btn inline-flex items-center save-all">
                   <img src="../../assets/icons/done_all_24.svg" alt="Save all">
                   <span class="px-2">Save all</span>
@@ -98,8 +99,9 @@
     </div>
 
     <div class="flex w-100 justify-center mt-4 footer">
-      <button class=" page-btn main-btn inline-flex font-bold items-center ">
-        <a routerLink="/">Continue</a>
+      <button [disabled]="dataModified" class="page-btn main-btn inline-flex font-bold items-center">
+        <a *ngIf="!dataModified" routerLink="/billing">Continue</a>
+        <span *ngIf="dataModified">Continue</span>
       </button>
     </div>
 

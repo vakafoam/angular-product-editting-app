@@ -1,0 +1,66 @@
+<div class="container mx-auto px-4 sm:px-8 max-w-6xl">
+    <h1 class="text-center text-2xl font-bold m-8">Billing details</h1>
+    <div class="py-8">
+        <div>
+            <h2 class="text-xl font-semibold leading-tight ">Products</h2>
+        </div>
+        <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+            <div class="inline-block min-w-full shadow-md rounded-lg overflow-hidden">
+                <table class="min-w-full leading-normal">
+
+                    <thead>
+                        <tr>
+                            <th maxWidth="30px"> </th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Base price, €</th>
+                            <th>Tax rate, %</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let product of productsWithTaxes; let i = index">
+                            <td class="px-2 py-2">{{i+1}}</td>
+
+                            <td max-width="30px">
+                                <div class="flex">
+                                    <span>{{product.code}}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span>{{product.name}}</span>
+                            </td>
+                            <td>
+                                <span>{{product.basePrice}}</span>
+                            </td>
+                            <td>
+                                <span>{{product.tax}}</span>
+                            </td>
+                        </tr>
+
+                        <tr class="font-bold text-slate-700">
+                            <td colSpan="3" class="text-right ">{{'Total with tax:' | uppercase}}</td>
+                            <td colSpan="2" class="text-left ">{{total + ' €'}}</td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="6" class="">
+                                <button class="secondary-btn inline-flex items-center">
+                                    <img src="../../assets/icons/arrow_back_24.svg" alt="Add product">
+                                    <a routerLink="/">Back to editting</a>
+                                </button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flex w-100 justify-center mt-4 footer">
+            <button class="page-btn main-btn inline-flex font-bold items-center" (click)="onCheckout()">
+                <span>Checkout</span>
+            </button>
+        </div>
+
+    </div>
